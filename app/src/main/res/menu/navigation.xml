@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_events"
+        android:icon="@drawable/ic_action_event_note"
+        android:title="@string/title_events" />
+
+    <item
+        android:id="@+id/navigation_participants"
+        android:icon="@drawable/ic_action_card_membership"
+        android:title="@string/title_participants" />
+
+    <item
+        android:id="@+id/navigation_users"
+        android:icon="@drawable/ic_action_supervised_user_circle"
+        android:title="@string/title_users" />
+
+</menu>
