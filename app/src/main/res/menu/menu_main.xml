@@ -9,7 +9,7 @@
     </item>
 
     <item
-        android:id="@+id/navigation_registration"
+        android:id="@+id/menu_registration"
         android:icon="@drawable/ic_action_how_to_reg"
         android:title="@string/title_registration" />
 </menu>

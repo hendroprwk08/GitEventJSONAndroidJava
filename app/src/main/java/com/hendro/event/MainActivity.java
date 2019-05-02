@@ -2,6 +2,7 @@ package com.hendro.event;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -102,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
+            case R.id.menu_registration:
+                Intent i = new Intent(MainActivity.this, RegistrationActivity.class);
+                getApplicationContext().startActivity(i);
             case R.id.menu_add:
                 //composeMessage();
                 if (ACTIVE_FRAGMENT.equals("events")) {
