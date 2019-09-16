@@ -3,6 +3,7 @@ package com.hendro.event;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -69,15 +70,8 @@ class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.CardViewHolder> {
 
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                view = inflater.inflate(R.layout.users_form_layout, null);
-
-                dialog.setView(view);
-                dialog.setCancelable(true);
-                dialog.setIcon(R.drawable.ic_action_event_note);
-                dialog.setTitle("Event Form");
+                view = inflater.inflate(R.layout.users_form_layout, null); //ambil layout
 
                 et_username = (EditText) view.findViewById(R.id.et_form_user_username);
                 et_email = (EditText) view.findViewById(R.id.et_form_user_email);
@@ -112,7 +106,13 @@ class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.CardViewHolder> {
                 sp_active.setSelection(Arrays.asList(activeArr).indexOf(active));
                 sp_type.setSelection(Arrays.asList(typeArr).indexOf(type));
 
-                dialog.setNeutralButton("SAVE", new DialogInterface.OnClickListener() {
+                //detail dialog
+                new AlertDialog.Builder(context)
+                    .setView(view)
+                    .setCancelable(true)
+                    .setIcon(R.drawable.ic_action_event_note)
+                    .setTitle("Event Form")
+                    .setNeutralButton("SAVE", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
@@ -154,71 +154,101 @@ class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.CardViewHolder> {
 
                             queue.add(jsObjRequest);
 
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
 
-                            String stackTrace = Log.getStackTraceString(e);
+                                String stackTrace = Log.getStackTraceString(e);
 
+                                Toast.makeText(context,
+                                        stackTrace,
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton("DELETE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showDeletionDialog(et_username.getText().toString());
+                        }
+                    })
+                    .setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+            }
+
+            private void showDeletionDialog(final String value){
+                new AlertDialog.Builder(context)
+                    .setIcon(R.mipmap.ic_launcher)
+                    .setTitle("Warning")
+                    .setMessage("Delete " + value +"?")
+                    .setCancelable(true)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                url = "http://event-lcc-me.000webhostapp.com/pengguna.php?action=3&username=" + URLEncoder.encode(username, "utf-8");
+
+                                RequestQueue queue = Volley.newRequestQueue(context);
+                                JsonObjectRequest jsObjRequest = new JsonObjectRequest(
+                                        Request.Method.GET,
+                                        url,
+                                        null,
+                                        new Response.Listener<JSONObject>() {
+                                            @Override
+                                            public void onResponse(JSONObject response) {
+                                                Log.d("Delete: ", response.toString());
+
+                                                Toast.makeText(context,
+                                                        username + " deleted",
+                                                        Toast.LENGTH_SHORT).show();
+
+                                                //refresh fragment
+                                                UsersFragment fgm = new UsersFragment();
+                                                FragmentTransaction transaction = ((MainActivity) context).getSupportFragmentManager().beginTransaction();
+                                                transaction.replace(R.id.fl_container, fgm);
+                                                transaction.addToBackStack(null);
+                                                transaction.commit();
+                                            }
+                                        }, new Response.ErrorListener() {
+
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        // TODO Auto-generated method stub
+                                        Log.d("Events: ", error.toString());
+
+                                        Toast.makeText(context,
+                                                error.toString(),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                                queue.add(jsObjRequest);
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            }
+
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
                             Toast.makeText(context,
-                                    stackTrace,
+                                    "Deletion canceled",
                                     Toast.LENGTH_SHORT).show();
+
+                            dialog.dismiss();
+
+                            //showDetailDialog(view);
                         }
-
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.setNegativeButton("DELETE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            url = "http://event-lcc-me.000webhostapp.com/pengguna.php?action=3&username=" + URLEncoder.encode(username, "utf-8");
-
-                            RequestQueue queue = Volley.newRequestQueue(context);
-                            JsonObjectRequest jsObjRequest = new JsonObjectRequest(
-                                    Request.Method.GET,
-                                    url,
-                                    null,
-                                    new Response.Listener<JSONObject>() {
-
-                                        @Override
-                                        public void onResponse(JSONObject response) {
-                                            Log.d("Delete: ", response.toString());
-
-                                            Toast.makeText(context,
-                                                    username + " deleted",
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
-                                    }, new Response.ErrorListener() {
-
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    // TODO Auto-generated method stub
-                                    Log.d("Events: ", error.toString());
-
-                                    Toast.makeText(context,
-                                            error.toString(),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-                            queue.add(jsObjRequest);
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.show();
+                    })
+                    .show();
             }
         });
     }

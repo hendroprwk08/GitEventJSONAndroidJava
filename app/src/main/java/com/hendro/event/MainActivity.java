@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -101,11 +102,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("Hendro ", "onOptionsItemSelected: " + item.getItemId());
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.menu_registration:
                 Intent i = new Intent(MainActivity.this, RegistrationActivity.class);
-                getApplicationContext().startActivity(i);
+                this.startActivity(i);
+                return true;
             case R.id.menu_add:
                 //composeMessage();
                 if (ACTIVE_FRAGMENT.equals("events")) {
@@ -134,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                                         "&tgl=" + URLEncoder.encode(add_tv_date.getText().toString(), "utf-8") +
                                         "&jam=" + URLEncoder.encode(add_tv_time.getText().toString(), "utf-8");
 
+                                Log.d("hendro ", "onClick: " + url);
                                 RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
                                 JsonObjectRequest jsObjRequest = new JsonObjectRequest(
                                         Request.Method.GET,
@@ -150,8 +154,7 @@ public class MainActivity extends AppCompatActivity {
                                                         Toast.LENGTH_SHORT).show();
 
                                                 //refresh dengan load ulang fragment
-                                                //2-4-2019: dimatiin ada swipe to refresh
-                                                //loadFragment(new EventFragment());
+                                                loadFragment(new EventsFragment());
                                             }
                                         }, new Response.ErrorListener() {
 
@@ -172,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 String stackTrace = Log.getStackTraceString(e);
 
-                                Toast.makeText(getApplicationContext(),
+                                Toast.makeText(getBaseContext(),
                                         stackTrace,
                                         Toast.LENGTH_SHORT).show();
                             }
@@ -209,9 +212,9 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             try {
                                 String url = "http://event-lcc-me.000webhostapp.com/peserta.php?action=1" +
-                                        "&nama=" + URLEncoder.encode(d_tv_name.getText().toString(), "utf-8") +
-                                        "&kampus=" + URLEncoder.encode(d_tv_institution.getText().toString(), "utf-8") +
-                                        "&wa=" + URLEncoder.encode(d_tv_whatsapp.getText().toString(), "utf-8") +
+                                        "&name=" + URLEncoder.encode(d_tv_name.getText().toString(), "utf-8") +
+                                        "&institution=" + URLEncoder.encode(d_tv_institution.getText().toString(), "utf-8") +
+                                        "&whatsapp=" + URLEncoder.encode(d_tv_whatsapp.getText().toString(), "utf-8") +
                                         "&phone=" + URLEncoder.encode(d_tv_phone.getText().toString(), "utf-8") +
                                         "&email=" + URLEncoder.encode(d_tv_email.getText().toString(), "utf-8");
 
@@ -231,8 +234,7 @@ public class MainActivity extends AppCompatActivity {
                                                         Toast.LENGTH_SHORT).show();
 
                                                 //refresh dengan load ulang fragment
-                                                //2-4-2019: dimatiin ada swipe to refresh
-                                                //loadFragment(new EventFragment());
+                                                loadFragment(new ParticipantsFragment());
                                             }
                                         }, new Response.ErrorListener() {
 
@@ -268,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
                     });
 
                     dialog.show();
-                }else if (ACTIVE_FRAGMENT.equals("users")){
+                }else if (ACTIVE_FRAGMENT.equals("users")) {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                     LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -330,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                 //refresh dengan load ulang fragment
                                                 //2-4-2019: dimatiin ada swipe to refresh
-                                                //loadFragment(new EventFragment());
+                                                loadFragment(new UsersFragment());
                                             }
                                         }, new Response.ErrorListener() {
 
@@ -366,13 +368,10 @@ public class MainActivity extends AppCompatActivity {
                     });
 
                     dialog.show();
-                }else{
-                    Toast.makeText(getApplicationContext(), "Dalam Pengembangan", Toast.LENGTH_SHORT).show();
-                };
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
 }

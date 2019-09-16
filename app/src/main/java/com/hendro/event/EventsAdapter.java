@@ -3,6 +3,7 @@ package com.hendro.event;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -64,15 +65,8 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.CardViewHolder> {
 
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
                 view = inflater.inflate(R.layout.events_form_layout, null);
-
-                dialog.setView(view);
-                dialog.setCancelable(true);
-                dialog.setIcon(R.drawable.ic_action_event_note);
-                dialog.setTitle("Event Form");
 
                 d_tv_event = (EditText) view.findViewById(R.id.et_form_event_event);
                 d_tv_description = (EditText) view.findViewById(R.id.et_form_event_description);
@@ -84,7 +78,13 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.CardViewHolder> {
                 d_tv_date.setText(tgl);
                 d_tv_time.setText(jam);
 
-                dialog.setNeutralButton("SAVE", new DialogInterface.OnClickListener() {
+                new AlertDialog
+                    .Builder(context)
+                    .setView(view)
+                    .setCancelable(true)
+                    .setIcon(R.drawable.ic_action_event_note)
+                    .setTitle("Event Form")
+                    .setNeutralButton("SAVE", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
@@ -136,56 +136,90 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.CardViewHolder> {
                         }
 
                         dialog.dismiss();
-                    }
-                });
 
-                dialog.setNegativeButton("DELETE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        url = "http://event-lcc-me.000webhostapp.com/event.php?action=3&id=" + id;
+                        }
+                    })
+                    .setNegativeButton("DELETE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showDeleteDialog(d_tv_event.getText().toString());
+                        }
+                    })
+                    .setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+            }
 
-                        RequestQueue queue = Volley.newRequestQueue(context);
-                        JsonObjectRequest jsObjRequest = new JsonObjectRequest(
-                                Request.Method.GET,
-                                url,
-                                null,
-                                new Response.Listener<JSONObject>() {
+            private void showDeleteDialog(final String value) {
+                new AlertDialog.Builder(context)
+                    .setIcon(R.mipmap.ic_launcher)
+                    .setTitle("Warning")
+                    .setMessage("Delete " + value +" data?")
+                    .setCancelable(true)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            url = "http://event-lcc-me.000webhostapp.com/event.php?action=3&id=" + id;
 
-                                    @Override
-                                    public void onResponse(JSONObject response) {
-                                        Log.d("Delete: ", response.toString());
+                            RequestQueue queue = Volley.newRequestQueue(context);
+                            JsonObjectRequest jsObjRequest = new JsonObjectRequest(
+                                    Request.Method.GET,
+                                    url,
+                                    null,
+                                    new Response.Listener<JSONObject>() {
 
-                                        Toast.makeText(context,
-                                                d_tv_event.getText().toString() + " deleted",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onResponse(JSONObject response) {
+                                            Log.d("Delete: ", response.toString());
 
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                // TODO Auto-generated method stub
-                                Log.d("Events: ", error.toString());
+                                            Toast.makeText(context,
+                                                    d_tv_event.getText().toString() + " deleted",
+                                                    Toast.LENGTH_SHORT).show();
 
-                                Toast.makeText(context,
-                                        error.toString(),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                                            //refresh fragment
+                                            EventsFragment fgm = new EventsFragment();
+                                            FragmentTransaction transaction = ((MainActivity) context).getSupportFragmentManager().beginTransaction();
+                                            transaction.replace(R.id.fl_container, fgm);
+                                            transaction.addToBackStack(null);
+                                            transaction.commit();
 
-                        queue.add(jsObjRequest);
+                                        }
+                                    }, new Response.ErrorListener() {
 
-                        dialog.dismiss();
-                    }
-                });
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    // TODO Auto-generated method stub
+                                    Log.d("Events: ", error.toString());
 
-                dialog.setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                                    Toast.makeText(context,
+                                            error.toString(),
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
-                dialog.show();
+                            queue.add(jsObjRequest);
+
+                            dialog.dismiss();
+
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(context,
+                                    "Deletion process canceled",
+                                    Toast.LENGTH_SHORT).show();
+
+                            dialog.dismiss();
+
+                            //showDetailDialog(view);
+                        }
+                    })
+                    .show();
             }
         });
     }

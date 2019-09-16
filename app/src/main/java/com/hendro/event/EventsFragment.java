@@ -51,11 +51,6 @@ public class EventsFragment extends Fragment {
 
         fragment_view = view;
 
-        pDialog = new ProgressDialog(getContext());
-        pDialog.setMessage("Loading...");
-        pDialog.show();
-
-        load();
 
         // Lookup the swipe container view
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.eventSwipeRefreshLayout);
@@ -105,7 +100,6 @@ public class EventsFragment extends Fragment {
 
                         try {
                             JSONArray jsonArray = response.getJSONArray("result");
-
                             events.clear();
 
                             if (jsonArray.length() != 0) {
@@ -152,5 +146,23 @@ public class EventsFragment extends Fragment {
         });
 
         queue.add(jsObjRequest);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        pDialog = new ProgressDialog(getContext());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
+
+        load();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        Log.d("fevents", "dettach");
     }
 }

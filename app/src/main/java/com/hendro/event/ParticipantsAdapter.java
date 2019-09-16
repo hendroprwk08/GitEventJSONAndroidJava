@@ -3,7 +3,10 @@ package com.hendro.event;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -96,9 +99,9 @@ class ParticipantsAdapter extends RecyclerView.Adapter<ParticipantsAdapter.CardV
                         try {
                             url = "http://event-lcc-me.000webhostapp.com/peserta.php?action=2" +
                                     "&id=" + id +
-                                    "&nama=" + URLEncoder.encode(d_tv_name.getText().toString(), "utf-8") +
-                                    "&kampus=" + URLEncoder.encode(d_tv_institution.getText().toString(), "utf-8") +
-                                    "&wa=" + URLEncoder.encode(d_tv_whatsapp.getText().toString(), "utf-8") +
+                                    "&name=" + URLEncoder.encode(d_tv_name.getText().toString(), "utf-8") +
+                                    "&institution=" + URLEncoder.encode(d_tv_institution.getText().toString(), "utf-8") +
+                                    "&whatsapp=" + URLEncoder.encode(d_tv_whatsapp.getText().toString(), "utf-8") +
                                     "&phone=" + URLEncoder.encode(d_tv_phone.getText().toString(), "utf-8") +
                                     "&email=" + URLEncoder.encode(d_tv_email.getText().toString(), "utf-8");
 
@@ -149,6 +152,8 @@ class ParticipantsAdapter extends RecyclerView.Adapter<ParticipantsAdapter.CardV
                 dialog.setNegativeButton("DELETE", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        showDeletionDialog(d_tv_name.getText().toString());
+                        /*
                         url = "http://event-lcc-me.000webhostapp.com/peserta.php?action=3&id=" + id;
 
                         RequestQueue queue = Volley.newRequestQueue(context);
@@ -181,6 +186,7 @@ class ParticipantsAdapter extends RecyclerView.Adapter<ParticipantsAdapter.CardV
                         queue.add(jsObjRequest);
 
                         dialog.dismiss();
+                        */
                     }
                 });
 
@@ -192,6 +198,73 @@ class ParticipantsAdapter extends RecyclerView.Adapter<ParticipantsAdapter.CardV
                 });
 
                 dialog.show();
+            }
+
+            private void showDeletionDialog(final String value) {
+                new AlertDialog.Builder(context)
+                    .setIcon(R.mipmap.ic_launcher)
+                    .setTitle("Warning")
+                    .setMessage("Delete " + value +"?")
+                    .setCancelable(true)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        url = "http://event-lcc-me.000webhostapp.com/peserta.php?action=3&id=" + id;
+
+                        RequestQueue queue = Volley.newRequestQueue(context);
+                        JsonObjectRequest jsObjRequest = new JsonObjectRequest(
+                            Request.Method.GET,
+                            url,
+                            null,
+                            new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    Log.d("Delete: ", response.toString());
+
+                                    Toast.makeText(context,
+                                            value + " deleted",
+                                            Toast.LENGTH_SHORT).show();
+
+                                    //refresh fragment
+                                    ParticipantsFragment fgm = new ParticipantsFragment();
+                                    FragmentTransaction transaction = ((MainActivity) context).getSupportFragmentManager().beginTransaction();
+                                    transaction.replace(R.id.fl_container, fgm);
+                                    transaction.addToBackStack(null);
+                                    transaction.commit();
+
+                                }
+                            }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // TODO Auto-generated method stub
+                            Log.d("Events: ", error.toString());
+
+                            Toast.makeText(context,
+                                    error.toString(),
+                                    Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        queue.add(jsObjRequest);
+
+                        dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(context,
+                                    "Deletion canceled",
+                                    Toast.LENGTH_SHORT).show();
+
+                            dialog.dismiss();
+
+                            //showDetailDialog(view);
+                        }
+                    })
+                    .show();
             }
         });
     }

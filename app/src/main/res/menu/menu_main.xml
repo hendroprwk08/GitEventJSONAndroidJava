@@ -5,11 +5,12 @@
         android:id="@+id/menu_add"
         android:icon="@drawable/ic_action_add_circle_outline"
         app:showAsAction="always"
-        android:title="Add">
-    </item>
+        android:title="Add"/>
 
     <item
         android:id="@+id/menu_registration"
         android:icon="@drawable/ic_action_how_to_reg"
+        app:showAsAction="never"
         android:title="@string/title_registration" />
+
 </menu>
