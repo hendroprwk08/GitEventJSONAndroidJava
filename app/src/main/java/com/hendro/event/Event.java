@@ -3,7 +3,7 @@ package com.hendro.event;
 public class Event {
     String id, event, description, date, time;
 
-    public Event(String id, String event, String description, String date, String time) {
+    Event(String id, String event, String description, String date, String time) {
         this.id = id;
         this.event = event;
         this.description = description;
@@ -11,7 +11,7 @@ public class Event {
         this.time = time;
     }
 
-    public Event(String event, String description, String date, String time) {
+    Event(String event, String description, String date, String time) {
         this.event = event;
         this.description = description;
         this.date = date;

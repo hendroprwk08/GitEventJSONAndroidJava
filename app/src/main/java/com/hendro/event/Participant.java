@@ -3,7 +3,7 @@ package com.hendro.event;
 public class Participant {
     String id, name, institution, whatsapp, phone, email, input;
 
-    public Participant(String id, String name, String institution, String whatsapp, String phone, String email, String input) {
+    Participant(String id, String name, String institution, String whatsapp, String phone, String email, String input) {
         this.id = id;
         this.name = name;
         this.institution = institution;
@@ -13,7 +13,7 @@ public class Participant {
         this.input = input;
     }
 
-    public Participant(String name, String institution, String whatsapp, String phone, String email, String input) {
+    Participant(String name, String institution, String whatsapp, String phone, String email, String input) {
         this.name = name;
         this.institution = institution;
         this.whatsapp = whatsapp;

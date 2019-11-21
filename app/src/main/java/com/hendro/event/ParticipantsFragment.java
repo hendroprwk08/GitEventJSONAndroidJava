@@ -15,6 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -32,6 +35,8 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class ParticipantsFragment extends Fragment {
@@ -39,7 +44,13 @@ public class ParticipantsFragment extends Fragment {
     View fragment_view;
     private SwipeRefreshLayout swipeContainer;
     public List<Participant> members;
+
+    ArrayList<String> arr;
+    HashMap<String, String> mapData;
+
     ProgressDialog pDialog;
+    Spinner sp;
+    int EVENT_ID;
 
     public ParticipantsFragment() {
     }
@@ -56,7 +67,7 @@ public class ParticipantsFragment extends Fragment {
         pDialog.setMessage("Loading...");
         pDialog.show();
 
-        load();
+        loadEvent();
 
         // Lookup the swipe container view
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.participantSwipeRefreshLayout);
@@ -68,7 +79,7 @@ public class ParticipantsFragment extends Fragment {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                load();
+                load(EVENT_ID);
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -86,10 +97,26 @@ public class ParticipantsFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        sp = (Spinner) view.findViewById(R.id.sp_participants);
+        sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String eventVal = adapterView.getItemAtPosition(i).toString();
+                String idVal =  mapData.get(eventVal);
+
+                Log.d(Cons.MY_TAG, "onItemSelected: " + idVal);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         return view;
     }
 
-    void load() {
+    void load(int id) {
         RequestQueue queue = Volley.newRequestQueue(getContext());
         String url = "http://event-lcc-me.000webhostapp.com/peserta.php?action=4";
 
@@ -158,4 +185,74 @@ public class ParticipantsFragment extends Fragment {
 
         queue.add(jsObjRequest);
     }
+
+    void loadEvent() {
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        String url = "https://event-lcc-me.000webhostapp.com/load_event.php";
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("Event: ", response.toString());
+                        String id, event;
+
+                        try {
+                            JSONArray jsonArray = response.getJSONArray("result");
+
+                            //set hashMap u/ spinner
+                            mapData = new HashMap<String, String>();
+                            arr = new ArrayList<String>();
+
+                            if (jsonArray.length() != 0) {
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject data = jsonArray.getJSONObject(i);
+
+                                    id = data.getString("id").toString().trim();
+                                    event = data.getString("event").toString().trim();
+
+                                    //taruh di hashMap u/ spinner
+                                    mapData.put(event, id);
+                                    arr.add(event);
+                                }
+
+                                //persiapan array adapter
+                                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                                        getContext(),
+                                        R.layout.my_spinner, //spinner layout diubah
+                                        arr);
+
+                                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                sp.setAdapter(arrayAdapter);
+
+                            }
+
+                            if (pDialog.isShowing()) pDialog.dismiss();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO Auto-generated method stub
+                Log.d("Members ", error.toString());
+
+                Toast.makeText(getContext(),
+                        error.toString(),
+                        Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        queue.add(jsObjRequest);
+    }
+
+
 }

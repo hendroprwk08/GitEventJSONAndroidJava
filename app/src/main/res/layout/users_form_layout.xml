@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="#ffffff"
-    android:padding="15dp"
+    android:padding="@dimen/layout_15"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -78,14 +78,14 @@
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
+            android:padding="@dimen/layout_20"
             android:id="@+id/sp_form_user_active"
             android:layout_weight="1"></Spinner>
 
       <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
+            android:padding="@dimen/layout_20"
             android:id="@+id/sp_form_user_type"
             android:layout_weight="1"></Spinner>
 
