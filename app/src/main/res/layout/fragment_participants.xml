@@ -12,8 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/sp_participants"
-        android:layout_marginTop="@dimen/layout_8"
-        android:layout_marginBottom="@dimen/layout_15"/>
+        android:layout_marginTop="@dimen/layout_8"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_jumlah"
+        android:layout_marginLeft="@dimen/layout_10"
+        android:layout_marginBottom="@dimen/layout_15"
+        android:text="No Participant"/>
 
     <!-- TODO: Update blank fragment layout -->
     <android.support.v4.widget.SwipeRefreshLayout

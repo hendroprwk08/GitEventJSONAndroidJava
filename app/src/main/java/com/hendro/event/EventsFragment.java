@@ -94,7 +94,7 @@ public class EventsFragment extends Fragment {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("Events: ", response.toString());
+                        //Log.d("Events: ", response.toString());
                         String id, event, description, date, time;
                         events = new ArrayList<>();
 

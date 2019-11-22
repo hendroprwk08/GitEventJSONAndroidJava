@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -32,6 +33,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public class ParticipantsFragment extends Fragment {
 
     ProgressDialog pDialog;
     Spinner sp;
+    TextView tvJumlah;
     int EVENT_ID;
 
     public ParticipantsFragment() {
@@ -105,20 +108,25 @@ public class ParticipantsFragment extends Fragment {
                 String idVal =  mapData.get(eventVal);
 
                 Log.d(Cons.MY_TAG, "onItemSelected: " + idVal);
+
+                EVENT_ID = Integer.parseInt(idVal);
+
+                load(EVENT_ID);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
+                Log.d(Cons.MY_TAG, "onNothingSelected: "+ adapterView);
             }
         });
 
+        tvJumlah = (TextView) view.findViewById(R.id.tv_jumlah);
         return view;
     }
 
     void load(int id) {
         RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "http://event-lcc-me.000webhostapp.com/peserta.php?action=4";
+        String url = "http://event-lcc-me.000webhostapp.com/peserta.php?action=41&id="+ id;
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(
                 Request.Method.GET,
@@ -140,13 +148,13 @@ public class ParticipantsFragment extends Fragment {
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject data = jsonArray.getJSONObject(i);
 
-                                    id = data.getString("ID").toString().trim();
-                                    nama = data.getString("NAME").toString().trim();
-                                    kampus = data.getString("INSTITUTION").toString().trim();
-                                    whatsapp = data.getString("WHATSAPP").toString().trim();
-                                    phone = data.getString("PHONE").toString().trim();
-                                    email = data.getString("EMAIL").toString().trim();
-                                    input = data.getString("INPUT").toString().trim();
+                                    id = data.getString("id").toString().trim();
+                                    nama = data.getString("name").toString().trim();
+                                    kampus = data.getString("institution").toString().trim();
+                                    whatsapp = data.getString("whatsapp").toString().trim();
+                                    phone = data.getString("phone").toString().trim();
+                                    email = data.getString("email").toString().trim();
+                                    input = data.getString("input").toString().trim();
 
                                     members.add(new Participant(id, nama, kampus, whatsapp, phone, email, input));
                                 }
@@ -159,6 +167,7 @@ public class ParticipantsFragment extends Fragment {
                                 recyclerView.setAdapter(mAdapter);
                                 recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+                                tvJumlah.setText(members.size() + " Participants");
                                 if (pDialog.isShowing()) pDialog.dismiss();
 
                             }
