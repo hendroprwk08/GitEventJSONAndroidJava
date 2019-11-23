@@ -83,6 +83,10 @@ public class EventsFragment extends Fragment {
     }
 
     void load() {
+        pDialog.setTitle("Loading...");
+        pDialog.setMessage("Getting events data");
+        pDialog.show();
+
         RequestQueue queue = Volley.newRequestQueue(getContext());
         String url = "http://event-lcc-me.000webhostapp.com/event.php?action=4";
 
@@ -127,10 +131,9 @@ public class EventsFragment extends Fragment {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
-
-                        if (events.size() == 0)
+                        }finally {
                             if (pDialog.isShowing()) pDialog.dismiss();
+                        }
                     }
                 }, new Response.ErrorListener() {
 
@@ -151,11 +154,7 @@ public class EventsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
         pDialog = new ProgressDialog(getContext());
-        pDialog.setMessage("Loading...");
-        pDialog.show();
-
         load();
     }
 

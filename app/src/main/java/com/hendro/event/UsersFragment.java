@@ -54,9 +54,9 @@ public class UsersFragment extends Fragment {
         fragment_view = view;
 
         pDialog = new ProgressDialog(getContext());
-        pDialog.setMessage("Loading...");
+        pDialog.setTitle("Loading...");
+        pDialog.setMessage("Getting user list");
         pDialog.show();
-
         load();
 
         // Lookup the swipe container view
@@ -134,10 +134,9 @@ public class UsersFragment extends Fragment {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
-
-                        if (users.size() == 0)
+                        }finally {
                             if (pDialog.isShowing()) pDialog.dismiss();
+                        }
                     }
                 }, new Response.ErrorListener() {
 

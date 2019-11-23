@@ -67,8 +67,6 @@ public class ParticipantsFragment extends Fragment {
         fragment_view = view;
 
         pDialog = new ProgressDialog(getContext());
-        pDialog.setMessage("Loading...");
-        pDialog.show();
 
         loadEvent();
 
@@ -125,6 +123,10 @@ public class ParticipantsFragment extends Fragment {
     }
 
     void load(int id) {
+        pDialog.setTitle("Loading...");
+        pDialog.setMessage("Getting participant data");
+        pDialog.show();
+
         RequestQueue queue = Volley.newRequestQueue(getContext());
         String url = "http://event-lcc-me.000webhostapp.com/peserta.php?action=41&id="+ id;
 
@@ -158,25 +160,23 @@ public class ParticipantsFragment extends Fragment {
 
                                     members.add(new Participant(id, nama, kampus, whatsapp, phone, email, input));
                                 }
-
-                                RecyclerView recyclerView = (RecyclerView) fragment_view.findViewById(R.id.rv_participants);
-                                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-                                ParticipantsAdapter mAdapter = new ParticipantsAdapter(getContext());
-                                mAdapter.addAll(members);
-                                recyclerView.setAdapter(mAdapter);
-                                recyclerView.setItemAnimator(new DefaultItemAnimator());
-
                                 tvJumlah.setText(members.size() + " Participants");
-                                if (pDialog.isShowing()) pDialog.dismiss();
-
+                            }else{
+                                tvJumlah.setText("No Participant");
                             }
+
+                            RecyclerView recyclerView = (RecyclerView) fragment_view.findViewById(R.id.rv_participants);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+                            ParticipantsAdapter mAdapter = new ParticipantsAdapter(getContext());
+                            mAdapter.addAll(members);
+                            recyclerView.setAdapter(mAdapter);
+                            recyclerView.setItemAnimator(new DefaultItemAnimator());
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
-
-                        if (members.size() == 0)
+                        }finally {
                             if (pDialog.isShowing()) pDialog.dismiss();
+                        }
                     }
                 }, new Response.ErrorListener() {
 
@@ -196,6 +196,10 @@ public class ParticipantsFragment extends Fragment {
     }
 
     void loadEvent() {
+        pDialog.setTitle("Loading...");
+        pDialog.setMessage("Getting event data");
+        pDialog.show();
+
         RequestQueue queue = Volley.newRequestQueue(getContext());
         String url = "https://event-lcc-me.000webhostapp.com/load_event.php";
 
@@ -237,7 +241,6 @@ public class ParticipantsFragment extends Fragment {
 
                                 arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                 sp.setAdapter(arrayAdapter);
-
                             }
 
                             if (pDialog.isShowing()) pDialog.dismiss();
